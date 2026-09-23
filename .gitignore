@@ -10,3 +10,7 @@ Thumbs.db
 
 .env
 *.log
+
+data/products.csv
+data/reviews_history.csv
+

@@ -7,7 +7,7 @@ services:
     image: apache/kafka:3.8.0
     container_name: kafka
     ports:
-      - "9094:9094"            # accès depuis la machine hôte : localhost:9094
+      - "9094:9094" # accès depuis la machine hôte : localhost:9094
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -20,7 +20,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"   # le topic doit être créé à la main (Partie 1)
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false" # le topic doit être créé à la main (Partie 1)
 
   postgres:
     image: postgres:16
@@ -34,7 +34,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  datagen:                     # s'exécute une seule fois : génère ./data/*.csv
+  datagen:
+    # s'exécute une seule fois : génère ./data/*.csv
     image: python:3.11-slim
     container_name: datagen
     working_dir: /app
@@ -43,12 +44,13 @@ services:
       - ./data:/data
     command: python generate_history.py
 
-  producer:                    # flux temps réel -> Kafka (lancé explicitement)
+  producer:
+    # flux temps réel -> Kafka (lancé explicitement)
     image: python:3.11-slim
     container_name: producer
-    profiles: ["stream"]
+    profiles: [ "stream" ]
     working_dir: /app
-    depends_on: [kafka]
+    depends_on: [ kafka ]
     volumes:
       - ./datagen:/app
     environment:
@@ -56,15 +58,15 @@ services:
       TOPIC: reviews_stream
       RATE: "5"
       LATE_RATIO: "0.05"
-    command: sh -c "pip install -q --disable-pip-version-check 'kafka-python>=2.0.2' && python -u producer.py"
+    command: sh -c "pip install -q --disable-pip-version-check 'kafka-python>=2.0.2,<3' && python -u producer.py"
 
   jupyter:
     image: quay.io/jupyter/pyspark-notebook:spark-3.5.3
     container_name: jupyter
     user: root
     ports:
-      - "8888:8888"            # JupyterLab : http://localhost:8888/lab?token=shopstream
-      - "4040-4045:4040-4045"  # Spark UI (une par SparkSession active)
+      - "8888:8888" # JupyterLab : http://localhost:8888/lab?token=shopstream
+      - "4040-4045:4040-4045" # Spark UI (une par SparkSession active)
     environment:
       JUPYTER_TOKEN: shopstream
       CHOWN_EXTRA: /home/jovyan/work
@@ -72,7 +74,7 @@ services:
     volumes:
       - ./notebooks:/home/jovyan/work/notebooks
       - ./data:/home/jovyan/work/data
-    depends_on: [kafka, postgres, datagen]
+    depends_on: [ kafka, postgres, datagen ]
 
 volumes:
   pgdata:
