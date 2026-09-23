@@ -56,7 +56,7 @@ services:
       TOPIC: reviews_stream
       RATE: "5"
       LATE_RATIO: "0.05"
-    command: sh -c "pip install -q --disable-pip-version-check 'kafka-python>=2.0.2' && python -u producer.py"
+    command: sh -c "pip install -q --disable-pip-version-check 'kafka-python==2.0.2' && python -u producer.py"
 
   jupyter:
     image: quay.io/jupyter/pyspark-notebook:spark-3.5.3
